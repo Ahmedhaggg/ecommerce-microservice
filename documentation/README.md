@@ -15,17 +15,18 @@ This is an ecommerce microservices-based application comprising six services: Us
 
 ## Overview
 
-This project demonstrates a practical microservices architecture. Each service is independently deployable and communicates with others via RabbitMQ. The services are containerized using Docker and orchestrated using Kubernetes.
+This project demonstrates a practical microservices architecture. Each service is independently deployable and communicates with others via kafka and tcp. The services are containerized using Docker and orchestrated using Kubernetes. CI/CD is implemented using github actions.
 
 ## Architecture
 
 ```mermaid
 graph TD;
-    UserService -->|Async (RabbitMQ)| EmailService;
-    UserService -->|REST API| ProductService;
-    ProductService -->|Async (RabbitMQ)| InventoryService;
-    OrderService -->|REST API| PaymentService;
-    OrderService -->|Async (RabbitMQ)| InventoryService;
+    UserService -->|Async (Kafka)| EmailService;
+    ProductService -->|Async (Kafka)| InventoryService;
+    OrderService -->|SAGA Pattern| UserService;
+    OrderService -->|SAGA Pattern| InventoryService;
+    OrderService -->|SAGA Pattern| PaymentService;
+    OrderService -->|SAGA Pattern| EmailService;
 ```
 
 #### **Services Overview**
@@ -33,14 +34,14 @@ graph TD;
 ```markdown
 ## Services Overview
 
-1. **User Service**: Handles user authentication and profile management.
+1. **User Service**: Handles user authentication, user profile management and employee management.
 2. **Product Service**: Manages product catalog.
 3. **Order Service**: Processes customer orders.
 4. **Email Service**: Sends emails for account verification and order notifications.
 5. **Payment Service**: Handles payment processing.
 6. **Inventory Service**: Manages product stock and inventory.
 
-All services communicate asynchronously using RabbitMQ or synchronously using REST APIs.
+All services communicate asynchronously using Kafka or synchronously using REST APIs OR SAGA PATTERN.
 ```
 
 ## Tech Stack
@@ -49,10 +50,11 @@ All services communicate asynchronously using RabbitMQ or synchronously using RE
 
 -   Node.js
 -   Express.js
--   RabbitMQ
--   Redis (for Email Service caching)
--   MongoDB (User and Product Services)
--   MySQL (Order and Payment Services)
+-   Nest.js
+-   Kafka (Syncrouns communication)
+-   Redis (Caching)
+-   MongoDB (Product Service)
+-   PostgreSQL (User, Inventory, Payment and Order Services)
 
 ### DevOps
 
@@ -73,43 +75,17 @@ All services communicate asynchronously using RabbitMQ or synchronously using RE
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-repo/microservices-app.git
-    cd microservices-app
+    git clone https://github.com/Ahmedhaggg/ecommerce-microservice.git
     ```
 
 ---
 
 ### **5. API Documentation**
 
-Use Swagger or Postman for API documentation. Include links in the README.
+Use Postman for API documentation.
 
-```markdown
+````markdown
 ## API Documentation
-
-### User Service
-
--   **Base URL**: `/api/v1/users`
--   **Endpoints**:
-    -   `POST /login`: User login.
-    -   `POST /register`: User registration.
-    -   `GET /profile`: Fetch user profile.
-
-Full documentation is available [here](docs/api-docs/user-service.md).
-```
-
-## Contributing
-
-We welcome contributions! To get started:
-
-1. Fork the repository.
-2. Create a new branch (`feature/new-feature`).
-3. Make your changes and commit them.
-4. Open a pull request.
-
-### Code Style
-
--   Use Prettier for formatting.
--   Follow the ESLint configuration in the project.
 
 ### Running Tests
 
@@ -117,19 +93,11 @@ Run unit tests for any service:
 
 ```bash
 cd services/user-service
-npm test
+npm run test
 ```
+````
 
 ---
-
-### **8. `docs/` Directory**
-
-Create detailed sub-documents for specific topics.
-
-#### Example: `docs/architecture.md`
-
-```markdown
-# Architecture
 
 ## Communication
 
@@ -138,7 +106,10 @@ Create detailed sub-documents for specific topics.
 
 ## Database Design
 
--   **User Service**: MongoDB (NoSQL, flexible for user data).
--   **Order Service**: MySQL (relational database for transactional consistency).
+-   **Product Service**: MongoDB (NoSQL, flexible for user data).
+-   **Order Service**: PostgreSQL (relational database for transactional consistency).
     ...
+
+```
+
 ```

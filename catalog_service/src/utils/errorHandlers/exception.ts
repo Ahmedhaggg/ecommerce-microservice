@@ -1,9 +1,11 @@
 import createError from "http-errors";
 import { HTTPStatusCode } from "./httpStatusCode";
 
-export class HttpException {
-	constructor(status: HTTPStatusCode, message: string) {
-		throw createError(status, message);
+export class HttpException extends Error {
+	constructor(public status: HTTPStatusCode, message: string) {
+		super(message);
+		this.name = this.constructor.name;
+		Object.setPrototypeOf(this, new.target.prototype);
 	}
 }
 

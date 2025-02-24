@@ -20,16 +20,23 @@ import { Broker } from "../../utils/broker/broker";
 
 const container = new Container();
 
-container.bind<IProductService>(TYPES.ProductService).to(ProductService);
+// product repository
 container
 	.bind<ProductRepository>(TYPES.ProductRepository)
 	.to(ProductRepository);
+
+// product service
+container.bind<IProductService>(TYPES.ProductService).to(ProductService);
+
+// product controller
 container
 	.bind<ProductController>(TYPES.ProductController)
 	.to(ProductController);
 
+// kafka group id
 container.bind<string>(TYPES.KAFKA_GROUP_ID).toConstantValue("catalog-service");
 
+// kafka config
 container.bind<IKafkaConfig>(TYPES.KafkaConfig).toConstantValue({
 	clientId: KAFKA_CLIENT_ID,
 	brokers: [KAFKA_BROKER_URI],
@@ -44,7 +51,7 @@ container
 		return new Kafka({
 			clientId: config.clientId,
 			brokers: config.brokers,
-			logLevel: config.logLevel,
+			// logLevel: config.logLevel,
 		});
 	})
 	.inSingletonScope();

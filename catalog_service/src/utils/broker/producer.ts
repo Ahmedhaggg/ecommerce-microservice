@@ -15,9 +15,10 @@ export class MessageProducer implements IMessageProducer {
 	}
 
 	public async publish<T>(topic: string, message: T): Promise<void> {
-		await this.producer.send({
+		const res = await this.producer.send({
 			topic,
 			messages: [{ value: JSON.stringify(message) }],
 		});
+		console.log(res);
 	}
 }
